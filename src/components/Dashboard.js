@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Navbar from 'react-bootstrap/Navbar'
 import { Nav, Button } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
@@ -7,7 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Modal from 'react-bootstrap/Modal'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
-import firebase from 'firebase'
+import { db } from '../services/firebase'
+import { generate } from 'shortid'
 
 export default function Dashboard() {
 
@@ -16,6 +17,8 @@ export default function Dashboard() {
 
     const firstNameRef = useRef()
     const lastNameRef = useRef()
+
+    const [measurements, setMeasurements] = useState([])
 
     const handleLogout = async () => {
         try {
@@ -49,17 +52,45 @@ export default function Dashboard() {
     }
 
     const addData = () => {
-        firebase.firestore().collection('users')
-            .doc('asd')
+        db.collection('users')
+            .doc(currentUser.uid)
+            .collection('measurements')
+            .doc(`${new Date()}`)
             .set({
-                id: 'asd',
-                firstName: 'jos',
-                lastName: 'stalin'
+                id: generate(),
+                firstName: firstNameRef.current.value,
+                lastName: lastNameRef.current.value
 
             })
-            .then(response => console.log(response))
-        // setShowLoggedOut(false)
+        handleClose()
     }
+
+    const fetchData = () => {
+        db.collection('users')
+            .doc(currentUser.uid)
+            .collection('measurements')
+            .get()
+            .then(response => {
+                const tempArray = []
+                response.forEach((item) => {
+                    const objToBeAdded = {
+                        id: item.id,
+                        ...item.data()
+                    }
+                    tempArray.push(objToBeAdded)
+                })
+                setMeasurements(tempArray)
+            })
+            .catch(e => console.log(e))
+
+    }
+
+    useEffect(() => {
+        fetchData()
+
+    }, [])
+
+    console.log(measurements)
 
     return (
         <React.Fragment>
@@ -112,6 +143,17 @@ export default function Dashboard() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            {measurements && measurements.map(item => (
+                <div key={item.id} style={{display:'inline-block', padding:'20px'}}>
+                    
+                        <div>Id: {item.id}</div>
+                        <div>First name: {item.firstName}</div>
+                        <div>Last name: {item.lastName}</div>
+                    
+                </div>
+            ))}
+
         </React.Fragment>
     )
 }

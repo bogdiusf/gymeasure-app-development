@@ -24,8 +24,6 @@ export default function Login() {
         } catch (e) {
             setError('Failed to sign in!')
         }
-        // setError('Failed to create an account!')
-
         setLoading(false)
     }
 
