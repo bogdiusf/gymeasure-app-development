@@ -1,20 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react'
-import Navbar from 'react-bootstrap/Navbar'
-import { Nav, Button } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
-import { useHistory } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../style.css'
-import Modal from 'react-bootstrap/Modal'
-import InputGroup from 'react-bootstrap/InputGroup'
-import FormControl from 'react-bootstrap/FormControl'
 import { db } from '../services/firebase'
 import { generate } from 'shortid'
+import ConfirmationModal from '../modals/ConfirmationModal'
+import DisplayMeasurements from './DisplayMeasurements'
+import EditPersonalInfoModal from '../modals/EditPersonalInfoModal'
+import LogoutModal from '../modals/LogoutModal'
+import AddPersonalInfoModal from '../modals/AddPersonalInfoModal'
+import DisplayNavbar from './DisplayNavbar'
 
 export default function Dashboard() {
 
-    const { currentUser, logout } = useAuth()
-    const history = useHistory()
+    const { currentUser } = useAuth()
+
 
     const firstNameRef = useRef()
     const lastNameRef = useRef()
@@ -29,8 +29,14 @@ export default function Dashboard() {
     const quadsRef = useRef()
     const chestRef = useRef()
 
+
     const [measurements, setMeasurements] = useState([])
     const [personalInfo, setPersonalInfo] = useState([])
+
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [age, setAge] = useState('')
+    const [sex, setSex] = useState('')
 
     const [showAddPersInfo, setShowAddPersInfo] = useState(false)
     const [showEditPersInfo, setShowEditPersInfo] = useState(false)
@@ -86,8 +92,18 @@ export default function Dashboard() {
 
     // adding personal info from inputs straight to firestore
     const addPersonalInfo = () => {
-        if (!firstNameRef.current.value && !lastNameRef.current.value) {
-            setError('Fill in first name or last name');
+        if (!firstNameRef.current.value || !lastNameRef.current.value) {
+            if (firstNameRef.current.value) {
+                setError('Attention! Type your last name in order to continue!');
+            }
+            else
+                if (lastNameRef.current.value) {
+                    setError('Attention! Type your first name in order to continue!');
+                }
+                else {
+                    setError('Attention! Both first name and last name must be typed in order to continue!');
+                }
+            handleCloseAddPersonalInfo()
             handleShowConfirmationModal()
             return
         }
@@ -165,161 +181,67 @@ export default function Dashboard() {
 
     }
 
-    // calling fetch data once, as soon as component loads
+    // calling fetchData once, as soon as component loads
     useEffect(() => {
         fetchData()
     }, [])
 
-    const handleLogout = async () => {
-        try {
-            logout()
-            history.push('/login')
-        }
-        catch (e) {
-            console.log(e)
-        }
-    }
-
     return (
         <React.Fragment>
-            <Navbar expand="lg" className="d-flex flex-row" style={{ padding: '20px', backgroundColor: 'rgba(0,0,0,0.2)' }}>
-                    {
-                        personalInfo.length > 0 && personalInfo.map(item => (
-                            <div key={item.id} id="navbarBrand">
-                                <Navbar.Brand style={{ fontWeight: '700', color: 'rgba(0,0,0,0.8)' }}>{item.firstName} {item.lastName}</Navbar.Brand><br />
-                                <Navbar.Brand style={{ fontWeight: '500', color: 'white' }}>{currentUser.email}</Navbar.Brand>
-                            </div>
-                        ))}
-                    <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-                    <Navbar.Collapse id="basic-navbar-nav" style={{ textAlign: 'center' }} id="navbarRightSideItems">
-                        <Nav className="d-flex gap-4" style={{ marginLeft: 'auto'}} >
-                            <br />
-                            <Button onClick={() => alert('To be implemented. Priority: I')}>Add today's measurements</Button>
-                            {
-                                personalInfo.length === 0 ?
-                                    <Button onClick={handleShowAddPersonalInfo}>Add personal info</Button>
-                                    :
-                                    <Button onClick={handleShowEditPersonalInfo}>Edit personal info</Button>
-                            }
 
-                            <Nav.Link id="logOutButton" onClick={handleShowLoggedOut}>Log out</Nav.Link>
-                        </Nav>
-                    </Navbar.Collapse>
-            </Navbar>
-
+            <DisplayNavbar
+                personalInfo={personalInfo}
+                currentUser={currentUser}
+                handleShowAddPersonalInfo={handleShowAddPersonalInfo}
+                handleShowEditPersonalInfo={handleShowEditPersonalInfo}
+                handleShowLoggedOut={handleShowLoggedOut}
+            />
 
             {
                 personalInfo.length === 0 ?
-                    <Modal show={showAddPersInfo} onHide={handleCloseAddPersonalInfo} backdrop="static">
-                        <Modal.Header style={{ backgroundColor: 'rgba(255, 25, 204, 0.2)' }}>
-                            <Modal.Title style={{ margin: 'auto' }}>Add personal info</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <InputGroup className="mb-3">
-                                <InputGroup.Prepend style={{ display: 'flex' }}>
-                                    <InputGroup.Text>First name</InputGroup.Text>
-                                    <FormControl ref={firstNameRef} />
-                                    <InputGroup.Text>Last name</InputGroup.Text>
-                                    <FormControl ref={lastNameRef} />
-                                </InputGroup.Prepend>
 
-                            </InputGroup>
-                            <InputGroup className="mb-3">
-                                <InputGroup.Prepend style={{ display: 'flex' }}>
-                                    <InputGroup.Text>Age</InputGroup.Text>
-                                    <FormControl ref={ageRef} />
-                                    <InputGroup.Text>Sex</InputGroup.Text>
-                                    <FormControl ref={sexRef} />
-                                </InputGroup.Prepend>
-
-                            </InputGroup>
-                            <Modal.Footer>
-                                <Button variant="danger" onClick={handleCloseAddPersonalInfo}>
-                                    Close
-                                </Button>
-                                <Button variant="success" onClick={() => addPersonalInfo()}>
-                                    Add info
-                                </Button>
-                            </Modal.Footer>
-                        </Modal.Body>
-                    </Modal>
+                    <AddPersonalInfoModal
+                        showAddPersInfo={showAddPersInfo}
+                        handleCloseAddPersonalInfo={handleCloseAddPersonalInfo}
+                        firstNameRef={firstNameRef}
+                        firstName={firstName}
+                        setFirstName={setFirstName}
+                        lastNameRef={lastNameRef}
+                        lastName={lastName}
+                        setLastName={setLastName}
+                        ageRef={ageRef}
+                        age={age}
+                        setAge={setAge}
+                        sexRef={sexRef}
+                        sex={sex}
+                        setSex={setSex}
+                        addPersonalInfo={addPersonalInfo}
+                    />
                     :
-                    <Modal show={showEditPersInfo} onHide={handleCloseEditPersonalInfo} backdrop="static" >
-                        <Modal.Header style={{ backgroundColor: 'rgba(255, 25, 204, 0.2)' }}>
-                            <Modal.Title style={{ margin: 'auto' }}>Edit personal info</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <InputGroup className="mb-3" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                                <InputGroup.Prepend style={{ display: 'block' }}>
-                                    <InputGroup.Text>First name</InputGroup.Text>
-                                    <InputGroup.Text>Last name</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                {personalInfo.map(item => (
-                                    <div key={item.id}>
-                                        <FormControl ref={editFirstNameRef} defaultValue={item.firstName} />
-                                        <FormControl ref={editLastNameRef} defaultValue={item.lastName} />
-                                    </div>
-                                ))}
-                            </InputGroup>
-                            <InputGroup className="mb-3" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                                <InputGroup.Prepend style={{ display: 'block' }}>
-                                    <InputGroup.Text>Age</InputGroup.Text>
-                                    <InputGroup.Text>Sex</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                {personalInfo.map(item => (
-                                    <div key={item.id}>
-                                        <FormControl ref={editAgeRef} defaultValue={item.age} />
-                                        <FormControl ref={editSexRef} defaultValue={item.sex} />
-                                    </div>
-                                ))}
-                            </InputGroup>
-                            <Modal.Footer>
-                                <Button variant="danger" onClick={handleCloseEditPersonalInfo}>
-                                    Close
-                                </Button>
-                                <Button variant="success" onClick={() => alert('To be implemented. Priority II')}>
-                                    Save Changes
-                                </Button>
-                            </Modal.Footer>
-                        </Modal.Body>
-                    </Modal>
+                    <EditPersonalInfoModal
+                        showEditPersInfo={showEditPersInfo}
+                        handleCloseEditPersonalInfo={handleCloseEditPersonalInfo}
+                        personalInfo={personalInfo}
+                        editFirstNameRef={editFirstNameRef}
+                        editLastNameRef={editLastNameRef}
+                        editAgeRef={editAgeRef}
+                        editSexRef={editSexRef}
+                    />
             }
 
+            <LogoutModal
+                showLoggedOut={showLoggedOut}
+                handleCloseLoggedOut={handleCloseLoggedOut}
+            />
 
-            <Modal show={showLoggedOut} onHide={handleCloseLoggedOut} backdrop="static">
-                <Modal.Header>
-                    <Modal.Title>Are you sure you want to log out?</Modal.Title>
-                </Modal.Header>
-                <Modal.Footer>
-                    <Button variant="success" onClick={handleLogout}>
-                        Yes
-                    </Button>
-                    <Button variant="danger" onClick={handleCloseLoggedOut}>
-                        No
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmationModal
+                confirmationModal={confirmationModal}
+                handleCloseConfirmationModal={handleCloseConfirmationModal}
+                handleShowAddPersonalInfo={handleShowAddPersonalInfo}
+                error={error}
+            />
 
-            <Modal show={confirmationModal} onHide={handleCloseConfirmationModal} backdrop="static">
-                <Modal.Header>
-                    <Modal.Title>{error}</Modal.Title>
-                </Modal.Header>
-                <Modal.Footer>
-                    <Button variant="danger" onClick={handleCloseConfirmationModal}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
-            {
-                measurements && measurements.map(item => (
-                    <div key={item.id} style={{ display: 'inline-block', padding: '20px' }}>
-                        <div>Id: {item.id}</div>
-                        <div>First name: {item.firstName}</div>
-                        <div>Last name: {item.lastName}</div>
-                    </div>
-                ))
-            }
+            {/* <DisplayMeasurements personalInfo={personalInfo} /> */}
 
         </React.Fragment >
     )

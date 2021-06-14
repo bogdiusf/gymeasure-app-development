@@ -1,32 +1,70 @@
-#logOutButton{
+body {
+    background-image: url('./images/gym_pic.jpg');
+    background-size: cover;
+    background-color: rgba(0, 0, 0, 0.8);
+    background-blend-mode: darken;
+}
+
+#logOutButton {
     background-color: red;
     color: white;
     transition: 0.5s;
-    font-size: 20px;
+    font-size: 1.2vw;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 5px;
+    margin-left: 50px;
+    margin-right: -10%;
+    display: grid;
+    place-items: center;
 }
 
-#logOutButton:hover{
+#logOutButton:hover {
     background-color: rgba(200, 247, 197, 1);
-    border-radius: 0;
     color: black;
 }
 
-#navbarBrand{
+#navbarBrand {
     margin-left: 10%;
 }
 
-#navbarRightSideItems{
-    margin-right:10%;
+#navbarBrand>* {
+    font-size: 1.3vw;
 }
 
+#basic-navbar-nav {
+    margin-right: 10%;
+}
 
-@media (max-width:400px){
-    #navbarBrand{
+#basic-navbar-nav>.d-flex>* {
+    font-size: 1.2vw;
+}
+
+@media (max-width: 1000px) {
+    #navbarBrand {
         margin: 0;
     }
-    #navbarRightSideItems{
+    #navbarBrand>* {
+        font-size: 2.4vw;
+    }
+    #basic-navbar-nav {
         margin: 0;
+    }
+    #basic-navbar-nav>.d-flex>* {
+        font-size: 2.4vw;
+    }
+    #logOutButton {
+        margin: 0;
+        font-size: 2.4vw;
+        width: 50%;
+        margin-left: auto;
+        margin-right: 0;
+    }
+    #basic-navbar-nav>.d-flex>#addMeasurementsButton {
+        width: 50%;
+        padding: 10px;
+    }
+    #basic-navbar-nav>.d-flex>#editPersInfoButton {
+        width: 50%;
+        margin: auto;
     }
 }
