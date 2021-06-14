@@ -1,0 +1,32 @@
+#logOutButton{
+    background-color: red;
+    color: white;
+    transition: 0.5s;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+#logOutButton:hover{
+    background-color: rgba(200, 247, 197, 1);
+    border-radius: 0;
+    color: black;
+}
+
+#navbarBrand{
+    margin-left: 10%;
+}
+
+#navbarRightSideItems{
+    margin-right:10%;
+}
+
+
+@media (max-width:400px){
+    #navbarBrand{
+        margin: 0;
+    }
+    #navbarRightSideItems{
+        margin: 0;
+    }
+}
