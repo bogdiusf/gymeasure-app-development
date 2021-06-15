@@ -20,7 +20,7 @@ export default function EditPersonalInfoModal(props) {
                     {props.personalInfo.map(item => (
                         <div key={item.id}>
                             <FormControl ref={props.editFirstNameRef} defaultValue={item.firstName} onChange={() => props.setIsSaveChangesEnabled(true)}/>
-                            <FormControl ref={props.editLastNameRef} defaultValue={item.lastName} />
+                            <FormControl ref={props.editLastNameRef} defaultValue={item.lastName} onChange={() => props.setIsSaveChangesEnabled(true)}/>
                         </div>
                     ))}
                 </InputGroup>
@@ -31,8 +31,8 @@ export default function EditPersonalInfoModal(props) {
                     </InputGroup.Prepend>
                     {props.personalInfo.map(item => (
                         <div key={item.id}>
-                            <FormControl ref={props.editAgeRef} defaultValue={item.age} />
-                            <FormControl ref={props.editSexRef} defaultValue={item.sex} />
+                            <FormControl ref={props.editAgeRef} defaultValue={item.age} onChange={() => props.setIsSaveChangesEnabled(true)}/>
+                            <FormControl ref={props.editSexRef} defaultValue={item.sex} onChange={() => props.setIsSaveChangesEnabled(true)}/>
                         </div>
                     ))}
                 </InputGroup>

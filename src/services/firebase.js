@@ -14,25 +14,5 @@ const app = firebase.initializeApp({
 export const auth = app.auth()
 export const db = app.firestore()
 
-// export const createUserDocument = async (user) => {
-//     if (!user) return;
-
-//     const userRef = db.doc(`users/${user.uid}`);
-//     const snapShot = await userRef.get();
-
-//     if (!snapShot.exists){
-//         const {email} = user;
-
-//         try{
-//             userRef.set({
-//                 email,
-//                 created_at: new Date()
-//             })
-//         }catch(e){
-//             console.log(e)
-//         }
-//     }
-// }
-
 
 export default app

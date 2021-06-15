@@ -23,6 +23,7 @@ export default function Login() {
             history.push('/')
         } catch (e) {
             setError('Failed to sign in!')
+            console.log(e)
         }
         setLoading(false)
     }

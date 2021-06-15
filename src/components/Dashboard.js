@@ -49,14 +49,20 @@ export default function Dashboard() {
     const handleShowAddMeasurements = () => setShowAddMeasurements(true)
     const handleCloseAddMeasurements = () => setShowAddMeasurements(true)
 
-    const handleCloseEditPersonalInfo = () => setShowEditPersInfo(false)
+    const handleCloseEditPersonalInfo = () => {
+        setShowEditPersInfo(false)
+        setIsSaveChangesEnabled(false)
+    }
     const handleShowEditPersonalInfo = () => setShowEditPersInfo(true)
-    const handleCloseAddPersonalInfo = () => setShowAddPersInfo(false);
+    const handleCloseAddPersonalInfo = () => setShowAddPersInfo(false)
     const handleShowAddPersonalInfo = () => setShowAddPersInfo(true)
     const handleShowLoggedOut = () => setShowLoggedOut(true)
     const handleCloseLoggedOut = () => setShowLoggedOut(false)
     const handleShowConfirmationModal = () => setConfirmationModal(true)
-    const handleCloseConfirmationModal = () => setConfirmationModal(false)
+    const handleCloseConfirmationModal = () => {
+        setConfirmationModal(false)
+        setIsSaveChangesEnabled(false)
+    }
 
     const getCurrentDateAndTime = () => {
         const completeDate = new Date()
@@ -108,8 +114,8 @@ export default function Dashboard() {
 
     }
 
-    const addMeasurements = () => {
-        db.collection('users')
+    const addMeasurements = async () => {
+        await db.collection('users')
             .doc(currentUser.uid)
             .collection('')
             .doc('')
@@ -143,7 +149,7 @@ export default function Dashboard() {
             })
 
 
-         db.collection('users')
+        db.collection('users')
             .doc(currentUser.uid)
             .collection('personal-info')
             .onSnapshot(response => {
@@ -177,6 +183,7 @@ export default function Dashboard() {
                 sex: editSexRef.current.value
             })
         try {
+
             setError('Your info has been successfully updated!')
             handleCloseEditPersonalInfo()
             handleShowConfirmationModal()
@@ -191,9 +198,9 @@ export default function Dashboard() {
     // calling fetchData once, as soon as component loads
     useEffect(() => {
         fetchData()
-    },[])
+    }, [])
 
-    
+
 
     return (
         <React.Fragment>

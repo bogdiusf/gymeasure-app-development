@@ -12,7 +12,7 @@ export default function ConfirmationModal(props) {
             <Modal.Footer>
                 <Button variant="danger" onClick={() => {
                     if (props.error === 'Your info has been successfully added!' || props.error === 'Your info has been successfully updated!') {
-                        props.handleCloseConfirmationModal()
+                            props.handleCloseConfirmationModal()
                     }
                     else {
                         props.handleCloseConfirmationModal();
