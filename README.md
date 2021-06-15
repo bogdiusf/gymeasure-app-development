@@ -1,12 +1,17 @@
 # APP IN PROGRESS
 
-## Gymeasure app - track your gym progress
+## Gymeasure app(with firebase/firestore) - track your gym progress
 
 ### To do list
-- Implement addMeasurements() functionality
-- Implement AddMeasurements modal with inputs
-- Add rest of CRUD for measurements
+- Implement addMeasurements() functionality (DONE, but under further review)
+- Implement AddMeasurements modal with inputs (DONE, but under further review)
+- Add rest of CRUD for measurements ( Update, Delete)
 - Improve overall design
 
 ### Current stuck at's
 - Setting persistance for firebase login
+- Fixing dev tools console errors
+
+### Future want to do's
+- Implement search with text over measurements (search component code already visualized in my head, just needs implementation)
+- Think and add new features

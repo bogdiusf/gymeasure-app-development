@@ -10,6 +10,7 @@ import EditPersonalInfoModal from '../modals/EditPersonalInfoModal'
 import LogoutModal from '../modals/LogoutModal'
 import AddPersonalInfoModal from '../modals/AddPersonalInfoModal'
 import DisplayNavbar from './DisplayNavbar'
+import AddMeasurements from '../modals/AddMeasurements'
 
 export default function Dashboard() {
 
@@ -33,12 +34,16 @@ export default function Dashboard() {
 
     // initializing needed states  -----------
     const [measurements, setMeasurements] = useState([])
-    const [showAddMeasurements, setShowAddMeasurements] = useState(false)
     const [personalInfo, setPersonalInfo] = useState([])
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
     const [sex, setSex] = useState('')
+    const [armsSize, setArmsSize] = useState('')
+    const [quadsSize, setQuadsSize] = useState('')
+    const [chestSize, setChestSize] = useState('')
+    const [waistSize, setWaistSize] = useState('')
+    const [showAddMeasurements, setShowAddMeasurements] = useState(false)
     const [isSaveChangesEnabled, setIsSaveChangesEnabled] = useState(false)
     const [showAddPersInfo, setShowAddPersInfo] = useState(false)
     const [showEditPersInfo, setShowEditPersInfo] = useState(false)
@@ -50,7 +55,7 @@ export default function Dashboard() {
 
     // declaring functions who when called, change the behaviour of the modals 
     const handleShowAddMeasurements = () => setShowAddMeasurements(true)
-    const handleCloseAddMeasurements = () => setShowAddMeasurements(true)
+    const handleCloseAddMeasurements = () => setShowAddMeasurements(false)
 
     const handleCloseEditPersonalInfo = () => {
         setShowEditPersInfo(false)
@@ -218,6 +223,25 @@ export default function Dashboard() {
                 handleShowAddPersonalInfo={handleShowAddPersonalInfo}
                 handleShowEditPersonalInfo={handleShowEditPersonalInfo}
                 handleShowLoggedOut={handleShowLoggedOut}
+                handleShowAddMeasurements={handleShowAddMeasurements}
+            />
+
+            <AddMeasurements
+                showAddMeasurements={showAddMeasurements}
+                handleCloseAddMeasurements={handleCloseAddMeasurements}
+                addMeasurements={addMeasurements}
+                waistRef={waistRef}
+                armsRef={armsRef}
+                quadsRef={quadsRef}
+                chestRef={chestRef}
+                armsSize={armsSize}
+                quadsSize={quadsSize}
+                chestSize={chestSize}
+                waistSize={waistSize}
+                setChestSize={setChestSize}
+                setArmsSize={setArmsSize}
+                setWaistSize={setWaistSize}
+                setQuadsSize={setQuadsSize}
             />
 
             {   // render AddPersonalInfoModal only if logged user doesnt have any personal info, else, render edit modal

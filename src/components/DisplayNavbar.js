@@ -17,7 +17,7 @@ export default function DisplayNavbar(props) {
             <Navbar.Collapse id="basic-navbar-nav" style={{ textAlign: 'center', }}>
                 <Nav className="d-flex gap-4" style={{ marginLeft: 'auto' }} >
                     <br />
-                    <Button id="addMeasurementsButton" onClick={() => alert('To be implemented. Priority: I')} >Add today's measurements</Button>
+                    <Button id="addMeasurementsButton" onClick={() => props.handleShowAddMeasurements()} >Add today's measurements</Button>
                     {
                         props.personalInfo.length === 0 ?
                             <Button id="addInfoButton" onClick={props.handleShowAddPersonalInfo} style={{ padding: '10px' }}>Add personal info</Button>
@@ -28,7 +28,7 @@ export default function DisplayNavbar(props) {
                     <Nav.Link id="logOutButton" onClick={props.handleShowLoggedOut}><span id="test">Log out</span></Nav.Link>
                 </Nav>
             </Navbar.Collapse>
-        </Navbar>
+        </Navbar >
     )
 
 
