@@ -15,7 +15,6 @@ export default function Dashboard() {
 
     const { currentUser } = useAuth()
 
-
     const firstNameRef = useRef()
     const lastNameRef = useRef()
     const ageRef = useRef()
@@ -38,6 +37,8 @@ export default function Dashboard() {
     const [age, setAge] = useState('')
     const [sex, setSex] = useState('')
 
+    const [isSaveChangesEnabled, setIsSaveChangesEnabled] = useState(false)
+
     const [showAddPersInfo, setShowAddPersInfo] = useState(false)
     const [showEditPersInfo, setShowEditPersInfo] = useState(false)
     const [showLoggedOut, setShowLoggedOut] = useState(false)
@@ -45,36 +46,17 @@ export default function Dashboard() {
     const [confirmationModal, setConfirmationModal] = useState(false)
     const [error, setError] = useState('')
 
-    const handleShowAddMeasurements = () => {
-        setShowAddMeasurements(true)
-    }
-    const handleCloseAddMeasurements = () => {
-        setShowAddMeasurements(true)
-    }
-    const handleCloseEditPersonalInfo = () => {
-        setShowEditPersInfo(false)
-    }
-    const handleShowEditPersonalInfo = () => {
-        setShowEditPersInfo(true)
-    }
-    const handleCloseAddPersonalInfo = () => {
-        setShowAddPersInfo(false);
-    }
-    const handleShowAddPersonalInfo = () => {
-        setShowAddPersInfo(true)
-    };
-    const handleShowLoggedOut = () => {
-        setShowLoggedOut(true)
-    }
-    const handleCloseLoggedOut = () => {
-        setShowLoggedOut(false)
-    }
-    const handleShowConfirmationModal = () => {
-        setConfirmationModal(true)
-    }
-    const handleCloseConfirmationModal = () => {
-        setConfirmationModal(false)
-    }
+    const handleShowAddMeasurements = () => setShowAddMeasurements(true)
+    const handleCloseAddMeasurements = () => setShowAddMeasurements(true)
+
+    const handleCloseEditPersonalInfo = () => setShowEditPersInfo(false)
+    const handleShowEditPersonalInfo = () => setShowEditPersInfo(true)
+    const handleCloseAddPersonalInfo = () => setShowAddPersInfo(false);
+    const handleShowAddPersonalInfo = () => setShowAddPersInfo(true)
+    const handleShowLoggedOut = () => setShowLoggedOut(true)
+    const handleCloseLoggedOut = () => setShowLoggedOut(false)
+    const handleShowConfirmationModal = () => setConfirmationModal(true)
+    const handleCloseConfirmationModal = () => setConfirmationModal(false)
 
     const getCurrentDateAndTime = () => {
         const completeDate = new Date()
@@ -91,7 +73,7 @@ export default function Dashboard() {
     }
 
     // adding personal info from inputs straight to firestore
-    const addPersonalInfo = () => {
+    const addPersonalInfo = async () => {
         if (!firstNameRef.current.value || !lastNameRef.current.value) {
             if (firstNameRef.current.value) {
                 setError('Attention! Type your last name in order to continue!');
@@ -129,8 +111,8 @@ export default function Dashboard() {
     const addMeasurements = () => {
         db.collection('users')
             .doc(currentUser.uid)
-            .collection('personal-info')
-            .doc('Informatii personale')
+            .collection('')
+            .doc('')
             .set({
                 id: generate(),
                 arms: armsRef.current.value,
@@ -144,12 +126,11 @@ export default function Dashboard() {
     }
 
     // fetching data from firestore - measurements + personal info
-    const fetchData = () => {
+    const fetchData = async () => {
         db.collection('users')
             .doc(currentUser.uid)
             .collection('measurements')
-            .get()
-            .then(response => {
+            .onSnapshot(response => {
                 const tempArray = []
                 response.forEach((item) => {
                     const objToBeAdded = {
@@ -160,13 +141,12 @@ export default function Dashboard() {
                 })
                 setMeasurements(tempArray)
             })
-            .catch(e => console.log(e))
 
-        db.collection('users')
+
+         db.collection('users')
             .doc(currentUser.uid)
             .collection('personal-info')
-            .get()
-            .then(response => {
+            .onSnapshot(response => {
                 const tempArray = []
                 response.forEach((item) => {
                     const objToBeAdded = {
@@ -176,15 +156,44 @@ export default function Dashboard() {
                     tempArray.push(objToBeAdded)
                 })
                 setPersonalInfo(tempArray)
+                if (personalInfo.length === 0) {
+                    setFirstName('')
+                    setLastName('')
+                    setAge('')
+                    setSex('')
+                }
             })
-            .catch(e => console.log(e))
+    }
+
+    const updatePersonalInfo = async () => {
+        await db.collection('users')
+            .doc(currentUser.uid)
+            .collection('personal-info')
+            .doc('Informatii personale')
+            .update({
+                firstName: editFirstNameRef.current.value,
+                lastName: editLastNameRef.current.value,
+                age: editAgeRef.current.value,
+                sex: editSexRef.current.value
+            })
+        try {
+            setError('Your info has been successfully updated!')
+            handleCloseEditPersonalInfo()
+            handleShowConfirmationModal()
+        }
+        catch (e) {
+            alert(`${e}`)
+        }
+
 
     }
 
     // calling fetchData once, as soon as component loads
     useEffect(() => {
         fetchData()
-    }, [])
+    },[])
+
+    
 
     return (
         <React.Fragment>
@@ -226,6 +235,10 @@ export default function Dashboard() {
                         editLastNameRef={editLastNameRef}
                         editAgeRef={editAgeRef}
                         editSexRef={editSexRef}
+                        updatePersonalInfo={updatePersonalInfo}
+                        isSaveChangesEnabled={isSaveChangesEnabled}
+                        setIsSaveChangesEnabled={setIsSaveChangesEnabled}
+                        firstNamePassed={firstName}
                     />
             }
 
@@ -239,6 +252,7 @@ export default function Dashboard() {
                 handleCloseConfirmationModal={handleCloseConfirmationModal}
                 handleShowAddPersonalInfo={handleShowAddPersonalInfo}
                 error={error}
+                handleCloseEditPersonalInfo={handleCloseEditPersonalInfo}
             />
 
             {/* <DisplayMeasurements personalInfo={personalInfo} /> */}

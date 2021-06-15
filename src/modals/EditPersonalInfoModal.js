@@ -19,7 +19,7 @@ export default function EditPersonalInfoModal(props) {
                     </InputGroup.Prepend>
                     {props.personalInfo.map(item => (
                         <div key={item.id}>
-                            <FormControl ref={props.editFirstNameRef} defaultValue={item.firstName} />
+                            <FormControl ref={props.editFirstNameRef} defaultValue={item.firstName} onChange={() => props.setIsSaveChangesEnabled(true)}/>
                             <FormControl ref={props.editLastNameRef} defaultValue={item.lastName} />
                         </div>
                     ))}
@@ -40,7 +40,7 @@ export default function EditPersonalInfoModal(props) {
                     <Button variant="danger" onClick={props.handleCloseEditPersonalInfo}>
                         Close
                     </Button>
-                    <Button variant="success" onClick={() => alert('To be implemented. Priority II')}>
+                    <Button disabled={!props.isSaveChangesEnabled} variant="success"  onClick={() => props.updatePersonalInfo()}>
                         Save Changes
                     </Button>
                 </Modal.Footer>

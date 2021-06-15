@@ -1,5 +1,6 @@
 import React from 'react'
 import { Nav, Button, Navbar } from 'react-bootstrap'
+import '../style.css'
 
 export default function DisplayNavbar(props) {
 
@@ -8,8 +9,8 @@ export default function DisplayNavbar(props) {
             {
                 props.personalInfo.length > 0 && props.personalInfo.map(item => (
                     <div key={item.id} id="navbarBrand">
-                        <Navbar.Brand style={{ fontWeight: '700', color: 'rgba(255,255,255,0.75)' }}>{item.firstName} {item.lastName}</Navbar.Brand><br />
-                        <Navbar.Brand style={{ fontWeight: '500', color: 'rgba(255,255,255,0.75)' }}>{props.currentUser.email}</Navbar.Brand>
+                        <span id="navbarBrand-name"><Navbar.Brand style={{ fontWeight: '500', color: 'rgba(255,255,255,0.75)' }}>{item.firstName} {item.lastName}</Navbar.Brand></span><br />
+                        <span id="navbarBrand-email"><Navbar.Brand style={{ fontWeight: '400', color: 'rgba(255,255,255,0.75)' }}>{props.currentUser.email}</Navbar.Brand></span>
                     </div>
                 ))}
             <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }} />
@@ -24,7 +25,7 @@ export default function DisplayNavbar(props) {
                             <Button id="editPersInfoButton" onClick={props.handleShowEditPersonalInfo} style={{ padding: '10px' }}>Edit personal info</Button>
                     }
 
-                    <Nav.Link id="logOutButton" onClick={props.handleShowLoggedOut}>Log out</Nav.Link>
+                    <Nav.Link id="logOutButton" onClick={props.handleShowLoggedOut}><span id="test">Log out</span></Nav.Link>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
