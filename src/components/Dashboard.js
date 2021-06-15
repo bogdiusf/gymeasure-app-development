@@ -15,6 +15,8 @@ export default function Dashboard() {
 
     const { currentUser } = useAuth()
 
+
+    // declaring references from inputs ------
     const firstNameRef = useRef()
     const lastNameRef = useRef()
     const ageRef = useRef()
@@ -27,25 +29,26 @@ export default function Dashboard() {
     const armsRef = useRef()
     const quadsRef = useRef()
     const chestRef = useRef()
+    // ----------------------
 
-
+    // initializing needed states  -----------
     const [measurements, setMeasurements] = useState([])
+    const [showAddMeasurements, setShowAddMeasurements] = useState(false)
     const [personalInfo, setPersonalInfo] = useState([])
-
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [age, setAge] = useState('')
     const [sex, setSex] = useState('')
-
     const [isSaveChangesEnabled, setIsSaveChangesEnabled] = useState(false)
-
     const [showAddPersInfo, setShowAddPersInfo] = useState(false)
     const [showEditPersInfo, setShowEditPersInfo] = useState(false)
     const [showLoggedOut, setShowLoggedOut] = useState(false)
-    const [showAddMeasurements, setShowAddMeasurements] = useState(false)
     const [confirmationModal, setConfirmationModal] = useState(false)
     const [error, setError] = useState('')
+    // ---------------------
 
+
+    // declaring functions who when called, change the behaviour of the modals 
     const handleShowAddMeasurements = () => setShowAddMeasurements(true)
     const handleCloseAddMeasurements = () => setShowAddMeasurements(true)
 
@@ -63,7 +66,10 @@ export default function Dashboard() {
         setConfirmationModal(false)
         setIsSaveChangesEnabled(false)
     }
+    // --------------------
 
+
+    // function that returns a formatted date 'dd/mm/yyyy' and time 'hh:mm:ss'
     const getCurrentDateAndTime = () => {
         const completeDate = new Date()
         const day = completeDate.getDay() < 10 ? '0' + completeDate.getDay() : completeDate.getDay()
@@ -114,21 +120,22 @@ export default function Dashboard() {
 
     }
 
+    // adding measurements from inputs straight to firestore
     const addMeasurements = async () => {
         await db.collection('users')
             .doc(currentUser.uid)
-            .collection('')
-            .doc('')
+            .collection('measurements')
+            .doc()
             .set({
                 id: generate(),
                 arms: armsRef.current.value,
                 quads: quadsRef.current.value,
                 waist: waistRef.current.value,
                 chest: chestRef.current.value,
-                measured_at_day: getCurrentDateAndTime().date,
-                measured_at_time: getCurrentDateAndTime().time
+                measured_on: getCurrentDateAndTime().date,
+                measured_at: getCurrentDateAndTime().time
             })
-        handleCloseAddPersonalInfo()
+
     }
 
     // fetching data from firestore - measurements + personal info
@@ -213,7 +220,7 @@ export default function Dashboard() {
                 handleShowLoggedOut={handleShowLoggedOut}
             />
 
-            {
+            {   // render AddPersonalInfoModal only if logged user doesnt have any personal info, else, render edit modal
                 personalInfo.length === 0 ?
 
                     <AddPersonalInfoModal
@@ -249,11 +256,13 @@ export default function Dashboard() {
                     />
             }
 
+            {/* render logout modal */}
             <LogoutModal
                 showLoggedOut={showLoggedOut}
                 handleCloseLoggedOut={handleCloseLoggedOut}
             />
 
+            {/* confirmation modal thats being rendered on errors or succeded actions */}
             <ConfirmationModal
                 confirmationModal={confirmationModal}
                 handleCloseConfirmationModal={handleCloseConfirmationModal}
