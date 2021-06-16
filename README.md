@@ -11,6 +11,7 @@
 ### Current stuck at's
 - Setting persistance for firebase login
 - Fixing dev tools console errors
+- Dealing with global and local scoping with `CSS`
 
 ### Future want to do's
 - Implement search with text over measurements (search component code already visualized in my head, just needs implementation)
