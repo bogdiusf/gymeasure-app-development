@@ -1,6 +1,7 @@
 import React from 'react'
 import { Nav, Button, Navbar } from 'react-bootstrap'
 import '../style.css'
+// import logo from '../images/gym_logo.jpg'
 
 export default function DisplayNavbar(props) {
 
@@ -9,7 +10,11 @@ export default function DisplayNavbar(props) {
             {
                 props.personalInfo.length > 0 && props.personalInfo.map(item => (
                     <div key={item.id} id="navbarBrand">
-                        <span id="navbarBrand-name"><Navbar.Brand style={{ fontWeight: '500', color: 'rgba(255,255,255,0.75)' }}>{item.firstName} {item.lastName}</Navbar.Brand></span><br />
+                        <span id="navbarBrand-name">
+                            <Navbar.Brand style={{ fontWeight: '500', color: 'rgba(255,255,255,0.75)' }}>
+                                {/* <img src={logo} style={{ width: '30px', height: '30px' }}></img> */}
+                                <span>{item.firstName} {item.lastName}</span>
+                            </Navbar.Brand></span><br />
                         <span id="navbarBrand-email"><Navbar.Brand style={{ fontWeight: '400', color: 'rgba(255,255,255,0.75)' }}>{props.currentUser.email}</Navbar.Brand></span>
                     </div>
                 ))}

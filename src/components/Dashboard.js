@@ -127,12 +127,12 @@ export default function Dashboard() {
 
     // adding measurements from inputs straight to firestore
     const addMeasurements = async () => {
-        await db.collection('users')
+        db.collection('users')
             .doc(currentUser.uid)
             .collection('measurements')
             .doc()
             .set({
-                id: generate(),
+                measurement_id: generate(),
                 arms: armsRef.current.value,
                 quads: quadsRef.current.value,
                 waist: waistRef.current.value,
@@ -141,8 +141,17 @@ export default function Dashboard() {
                 measured_at: getCurrentDateAndTime().time
             })
 
-    }
+        setError('Your info has been successfully added!')
+        handleCloseAddMeasurements()
+        handleShowConfirmationModal()
+        setWaistSize('')
+        setArmsSize('')
+        setQuadsSize('')
+        setChestSize('')
 
+
+    }
+    console.log(measurements)
     // fetching data from firestore - measurements + personal info
     const fetchData = async () => {
         db.collection('users')
@@ -152,7 +161,7 @@ export default function Dashboard() {
                 const tempArray = []
                 response.forEach((item) => {
                     const objToBeAdded = {
-                        id: item.id,
+                        document_id: item.id,
                         ...item.data()
                     }
                     tempArray.push(objToBeAdded)
@@ -295,7 +304,7 @@ export default function Dashboard() {
                 handleCloseEditPersonalInfo={handleCloseEditPersonalInfo}
             />
 
-            {/* <DisplayMeasurements personalInfo={personalInfo} /> */}
+            <DisplayMeasurements measurements={measurements} />
 
         </React.Fragment >
     )
