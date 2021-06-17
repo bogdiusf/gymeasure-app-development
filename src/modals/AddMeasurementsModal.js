@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 
-export default function AddMeasurements(props) {
+export default function AddMeasurementsModal(props) {
 
     const {
         showAddMeasurements,

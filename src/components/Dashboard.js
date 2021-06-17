@@ -10,12 +10,13 @@ import EditPersonalInfoModal from '../modals/EditPersonalInfoModal'
 import LogoutModal from '../modals/LogoutModal'
 import AddPersonalInfoModal from '../modals/AddPersonalInfoModal'
 import DisplayNavbar from './DisplayNavbar'
-import AddMeasurements from '../modals/AddMeasurements'
+import AddMeasurementsModal from '../modals/AddMeasurementsModal'
+import EditMeasurementsModal from '../modals/EditMeasurementsModal'
 
 export default function Dashboard() {
 
+    // getting the current user context
     const { currentUser } = useAuth()
-
 
     // declaring references from inputs ------
     const firstNameRef = useRef()
@@ -30,10 +31,16 @@ export default function Dashboard() {
     const armsRef = useRef()
     const quadsRef = useRef()
     const chestRef = useRef()
+    const editWaistRef = useRef()
+    const editArmsRef = useRef()
+    const editChestRef = useRef()
+    const editQuadsRef = useRef()
     // ----------------------
 
     // initializing needed states  -----------
     const [measurements, setMeasurements] = useState([])
+    const [copyOfMeasurements, setCopyOfMeasurements] = useState()
+    const [copyForEditingOfMeasurements, setCopyForEditingOfMeasurements] = useState()
     const [personalInfo, setPersonalInfo] = useState([])
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
@@ -44,22 +51,27 @@ export default function Dashboard() {
     const [chestSize, setChestSize] = useState('')
     const [waistSize, setWaistSize] = useState('')
     const [showAddMeasurements, setShowAddMeasurements] = useState(false)
-    const [isSaveChangesEnabled, setIsSaveChangesEnabled] = useState(false)
+    const [isSavePInfoChangesEnabled, setIsSavePInfoChangesEnabled] = useState(false)
+    const [isSaveMeasurementChangesEnabled, setIsSaveMeasurementChangesEnabled] = useState(false)
     const [showAddPersInfo, setShowAddPersInfo] = useState(false)
     const [showEditPersInfo, setShowEditPersInfo] = useState(false)
     const [showLoggedOut, setShowLoggedOut] = useState(false)
     const [confirmationModal, setConfirmationModal] = useState(false)
+    const [showEditMeasurements, setShowEditMeasurements] = useState(false)
+    const [armsEdited, setArmsEdited] = useState('')
+    const [quadsEdited, setQuadsEdited] = useState('')
+    const [chestEdited, setChestEdited] = useState('')
+    const [waistEdited, setWaistEdited] = useState('')
     const [error, setError] = useState('')
+    const [tempDocId, setTempDocId] = useState(null)
     // ---------------------
-
 
     // declaring functions who when called, change the behaviour of the modals 
     const handleShowAddMeasurements = () => setShowAddMeasurements(true)
     const handleCloseAddMeasurements = () => setShowAddMeasurements(false)
-
     const handleCloseEditPersonalInfo = () => {
         setShowEditPersInfo(false)
-        setIsSaveChangesEnabled(false)
+        setIsSavePInfoChangesEnabled(false)
     }
     const handleShowEditPersonalInfo = () => setShowEditPersInfo(true)
     const handleCloseAddPersonalInfo = () => setShowAddPersInfo(false)
@@ -69,10 +81,23 @@ export default function Dashboard() {
     const handleShowConfirmationModal = () => setConfirmationModal(true)
     const handleCloseConfirmationModal = () => {
         setConfirmationModal(false)
-        setIsSaveChangesEnabled(false)
+        setIsSavePInfoChangesEnabled(false)
+    }
+    const handleShowEditMeasurements = (id) => {
+        setShowEditMeasurements(true)
+        const measurementEdited = [...measurements]
+        const index = measurementEdited.findIndex((item) => item.document_id === id)
+        setArmsEdited(measurementEdited[index].arms)
+        setQuadsEdited(measurementEdited[index].quads)
+        setChestEdited(measurementEdited[index].chest)
+        setWaistEdited(measurementEdited[index].waist)
+    }
+    
+    const handleCloseEditMeasurements = () => {
+        setShowEditMeasurements(false)
+        setIsSaveMeasurementChangesEnabled(false)
     }
     // --------------------
-
 
     // function that returns a formatted date 'dd/mm/yyyy' and time 'hh:mm:ss'
     const getCurrentDateAndTime = () => {
@@ -87,6 +112,50 @@ export default function Dashboard() {
         const date = day + '/' + month + '/' + year
 
         return { time, date }
+    }
+
+    // fetching data from firestore - measurements + personal info
+    const fetchData = async () => {
+        db.collection('users')
+            .doc(currentUser.uid)
+            .collection('measurements')
+            .orderBy("measured_on", "desc")
+            .onSnapshot(response => {
+                const tempArray = []
+                response.forEach((item) => {
+                    const objToBeAdded = {
+                        document_id: item.id,
+                        measured_on_day: item.measured_on_day,
+                        measured_at_time: item.measured_at_time,
+                        ...item.data()
+                    }
+                    tempArray.push(objToBeAdded)
+                })
+                setMeasurements(tempArray)
+                setCopyOfMeasurements(tempArray)
+            })
+
+
+        db.collection('users')
+            .doc(currentUser.uid)
+            .collection('personal-info')
+            .onSnapshot(response => {
+                const tempArray = []
+                response.forEach((item) => {
+                    const objToBeAdded = {
+                        id: item.id,
+                        ...item.data()
+                    }
+                    tempArray.push(objToBeAdded)
+                })
+                setPersonalInfo(tempArray)
+                if (personalInfo.length === 0) {
+                    setFirstName('')
+                    setLastName('')
+                    setAge('')
+                    setSex('')
+                }
+            })
     }
 
     // adding personal info from inputs straight to firestore
@@ -127,7 +196,7 @@ export default function Dashboard() {
 
     // adding measurements from inputs straight to firestore
     const addMeasurements = async () => {
-        db.collection('users')
+        await db.collection('users')
             .doc(currentUser.uid)
             .collection('measurements')
             .doc()
@@ -137,61 +206,28 @@ export default function Dashboard() {
                 quads: quadsRef.current.value,
                 waist: waistRef.current.value,
                 chest: chestRef.current.value,
-                measured_on: getCurrentDateAndTime().date,
-                measured_at: getCurrentDateAndTime().time
+                measured_on_day: getCurrentDateAndTime().date,
+                measured_at_time: getCurrentDateAndTime().time,
+                measured_on: new Date()
             })
+        try {
+            setError('Your info has been successfully added!')
+            handleCloseAddMeasurements()
+            handleShowConfirmationModal()
+            setWaistSize('')
+            setArmsSize('')
+            setQuadsSize('')
+            setChestSize('')
+        }
+        catch (e) {
+            alert(e)
+        }
 
-        setError('Your info has been successfully added!')
-        handleCloseAddMeasurements()
-        handleShowConfirmationModal()
-        setWaistSize('')
-        setArmsSize('')
-        setQuadsSize('')
-        setChestSize('')
 
 
     }
-    console.log(measurements)
-    // fetching data from firestore - measurements + personal info
-    const fetchData = async () => {
-        db.collection('users')
-            .doc(currentUser.uid)
-            .collection('measurements')
-            .onSnapshot(response => {
-                const tempArray = []
-                response.forEach((item) => {
-                    const objToBeAdded = {
-                        document_id: item.id,
-                        ...item.data()
-                    }
-                    tempArray.push(objToBeAdded)
-                })
-                setMeasurements(tempArray)
-            })
 
-
-        db.collection('users')
-            .doc(currentUser.uid)
-            .collection('personal-info')
-            .onSnapshot(response => {
-                const tempArray = []
-                response.forEach((item) => {
-                    const objToBeAdded = {
-                        id: item.id,
-                        ...item.data()
-                    }
-                    tempArray.push(objToBeAdded)
-                })
-                setPersonalInfo(tempArray)
-                if (personalInfo.length === 0) {
-                    setFirstName('')
-                    setLastName('')
-                    setAge('')
-                    setSex('')
-                }
-            })
-    }
-
+    // function that updates personal info data in firestore
     const updatePersonalInfo = async () => {
         await db.collection('users')
             .doc(currentUser.uid)
@@ -204,15 +240,65 @@ export default function Dashboard() {
                 sex: editSexRef.current.value
             })
         try {
-
             setError('Your info has been successfully updated!')
             handleCloseEditPersonalInfo()
             handleShowConfirmationModal()
         }
         catch (e) {
+            alert(e)
+        }
+    }
+
+    // function that deletes measurements from firestore
+    const deleteMeasurement = async (id) => {
+        await db.collection('users')
+            .doc(currentUser.uid)
+            .collection('measurements')
+            .doc(id)
+            .delete()
+        try {
+            setError('Your measurements has been successfully deleted!')
+            handleShowConfirmationModal()
+        }
+        catch (e) {
+            alert(e)
+        }
+    }
+
+    const updateMeasurements = async (id) => {
+        await db.collection('users')
+            .doc(currentUser.uid)
+            .collection('measurements')
+            .doc(id)
+            .update({
+                waist: editWaistRef.current.value,
+                arms: editArmsRef.current.value,
+                chest: editChestRef.current.value,
+                quads: editQuadsRef.current.value
+            })
+        try {
+            setError('Your info has been successfully updated!')
+            handleCloseEditMeasurements()
+            handleShowConfirmationModal()
+        }
+        catch (e) {
             alert(`${e}`)
         }
+    }
 
+    const filterMeasurements = (text) => {
+        if (text !== '') {
+            // const tempText = text
+            let newArr = measurements.filter(item => item.measured_on_day.includes(text))
+            setMeasurements(newArr)
+            newArr = copyOfMeasurements.filter(item => item.measured_on_day.includes(text))
+            if (text !== '' && newArr.length > 0) {
+                setMeasurements(newArr)
+            }
+        }
+        else if (text === '') {
+            setMeasurements(copyOfMeasurements)
+        }
 
     }
 
@@ -220,8 +306,6 @@ export default function Dashboard() {
     useEffect(() => {
         fetchData()
     }, [])
-
-
 
     return (
         <React.Fragment>
@@ -235,7 +319,7 @@ export default function Dashboard() {
                 handleShowAddMeasurements={handleShowAddMeasurements}
             />
 
-            <AddMeasurements
+            <AddMeasurementsModal
                 showAddMeasurements={showAddMeasurements}
                 handleCloseAddMeasurements={handleCloseAddMeasurements}
                 addMeasurements={addMeasurements}
@@ -251,6 +335,10 @@ export default function Dashboard() {
                 setArmsSize={setArmsSize}
                 setWaistSize={setWaistSize}
                 setQuadsSize={setQuadsSize}
+                editWaistRef={editWaistRef}
+                editArmsRef={editArmsRef}
+                editChestRef={editChestRef}
+                editQuadsRef={editQuadsRef}
             />
 
             {   // render AddPersonalInfoModal only if logged user doesnt have any personal info, else, render edit modal
@@ -283,8 +371,8 @@ export default function Dashboard() {
                         editAgeRef={editAgeRef}
                         editSexRef={editSexRef}
                         updatePersonalInfo={updatePersonalInfo}
-                        isSaveChangesEnabled={isSaveChangesEnabled}
-                        setIsSaveChangesEnabled={setIsSaveChangesEnabled}
+                        isSavePInfoChangesEnabled={isSavePInfoChangesEnabled}
+                        setIsSavePInfoChangesEnabled={setIsSavePInfoChangesEnabled}
                         firstNamePassed={firstName}
                     />
             }
@@ -304,7 +392,32 @@ export default function Dashboard() {
                 handleCloseEditPersonalInfo={handleCloseEditPersonalInfo}
             />
 
-            <DisplayMeasurements measurements={measurements} />
+            {/* displays all available measurements */}
+            <DisplayMeasurements
+                measurements={measurements}
+                deleteMeasurement={deleteMeasurement}
+                filterMeasurements={filterMeasurements}
+                handleShowEditMeasurements={handleShowEditMeasurements}
+                setTempDocId={setTempDocId}
+            />
+
+            {/* edit modal for measurements */}
+            <EditMeasurementsModal
+                showEditMeasurements={showEditMeasurements}
+                waistEdited={waistEdited}
+                chestEdited={chestEdited}
+                armsEdited={armsEdited}
+                quadsEdited={quadsEdited}
+                editArmsRef={editArmsRef}
+                editChestRef={editChestRef}
+                editQuadsRef={editQuadsRef}
+                editWaistRef={editWaistRef}
+                isSaveMeasurementChangesEnabled={isSaveMeasurementChangesEnabled}
+                setIsSaveMeasurementChangesEnabled={setIsSaveMeasurementChangesEnabled}
+                handleCloseEditMeasurements={handleCloseEditMeasurements}
+                tempDocId={tempDocId}
+                updateMeasurements={updateMeasurements}
+            />
 
         </React.Fragment >
     )

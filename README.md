@@ -16,3 +16,4 @@
 ### Future want to do's
 - Implement search with text over measurements (search component code already visualized in my head, just needs implementation)
 - Think and add new features
+- Posibility to add photos / each measurements "session" to keep track of visual progress

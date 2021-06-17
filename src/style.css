@@ -46,9 +46,9 @@ body {
 
 .measurementsWrapper {
     display: grid;
-    grid-template-columns: auto auto;
-    width: 80%;
-    margin: auto;
+    grid-template-columns: auto auto auto;
+    width: 100%;
+    justify-content: center;
 }
 
 .measurementDataWrapper {
