@@ -20,7 +20,7 @@
 - Improve overall design
 - Posibility to add photos / each measurements "session" to keep track of visual progress
 - Deployment (CI / CD)
-- Input validation
+- Edit personal info input validation
 - Fix bug auto rerender edit-update measurements
 - UI/UX improvement
 - Code review
