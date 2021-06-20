@@ -49,7 +49,7 @@ export default function ForgotPassword() {
                         </Card.Body>
                     </Card>
                     <div className="w-100 text-center mt-2">
-                        Don't have an account? <Link to="/signup">Sign up</Link>
+                        <span style={{ color: 'white' }}>Don't have an account?</span> <Link to="/signup">Sign up</Link>
                     </div>
                 </div>
             </Container>

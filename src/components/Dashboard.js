@@ -40,7 +40,6 @@ export default function Dashboard() {
     // initializing needed states  -----------
     const [measurements, setMeasurements] = useState([])
     const [copyOfMeasurements, setCopyOfMeasurements] = useState()
-    const [copyForEditingOfMeasurements, setCopyForEditingOfMeasurements] = useState()
     const [personalInfo, setPersonalInfo] = useState([])
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
@@ -58,6 +57,7 @@ export default function Dashboard() {
     const [showLoggedOut, setShowLoggedOut] = useState(false)
     const [confirmationModal, setConfirmationModal] = useState(false)
     const [showEditMeasurements, setShowEditMeasurements] = useState(false)
+    const [showDeleteMeasurementConfirmationModal, setShowDeleteMeasurementConfirmationModal] = useState(false)
     const [armsEdited, setArmsEdited] = useState('')
     const [quadsEdited, setQuadsEdited] = useState('')
     const [chestEdited, setChestEdited] = useState('')
@@ -92,11 +92,13 @@ export default function Dashboard() {
         setChestEdited(measurementEdited[index].chest)
         setWaistEdited(measurementEdited[index].waist)
     }
-    
+
     const handleCloseEditMeasurements = () => {
         setShowEditMeasurements(false)
         setIsSaveMeasurementChangesEnabled(false)
     }
+    const showDeleteMeasurementConfirmation = () => setShowDeleteMeasurementConfirmationModal(true)
+    const closeDeleteMeasurementConfirmation = () => setShowDeleteMeasurementConfirmationModal(false)
     // --------------------
 
     // function that returns a formatted date 'dd/mm/yyyy' and time 'hh:mm:ss'
@@ -115,7 +117,7 @@ export default function Dashboard() {
     }
 
     // fetching data from firestore - measurements + personal info
-    const fetchData = async () => {
+    const fetchData = () => {
         db.collection('users')
             .doc(currentUser.uid)
             .collection('measurements')
@@ -257,6 +259,7 @@ export default function Dashboard() {
             .doc(id)
             .delete()
         try {
+            setShowDeleteMeasurementConfirmationModal(false)
             setError('Your measurements has been successfully deleted!')
             handleShowConfirmationModal()
         }
@@ -289,9 +292,9 @@ export default function Dashboard() {
     const filterMeasurements = (text) => {
         if (text !== '') {
             // const tempText = text
-            let newArr = measurements.filter(item => item.measured_on_day.includes(text))
+            let newArr = measurements.filter(item => item.waist.includes(text))
             setMeasurements(newArr)
-            newArr = copyOfMeasurements.filter(item => item.measured_on_day.includes(text))
+            newArr = copyOfMeasurements.filter(item => item.waist.includes(text))
             if (text !== '' && newArr.length > 0) {
                 setMeasurements(newArr)
             }
@@ -399,6 +402,9 @@ export default function Dashboard() {
                 filterMeasurements={filterMeasurements}
                 handleShowEditMeasurements={handleShowEditMeasurements}
                 setTempDocId={setTempDocId}
+                showDeleteMeasurementConfirmation={showDeleteMeasurementConfirmation}
+                showDeleteMeasurementConfirmationModal={showDeleteMeasurementConfirmationModal}
+                closeDeleteMeasurementConfirmation={closeDeleteMeasurementConfirmation}
             />
 
             {/* edit modal for measurements */}

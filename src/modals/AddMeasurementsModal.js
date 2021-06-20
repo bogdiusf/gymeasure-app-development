@@ -34,19 +34,19 @@ export default function AddMeasurementsModal(props) {
                     <InputGroup.Prepend style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', margin: 'auto', gap: '20px', padding: '10px' }}>
                         <div>
                             <InputGroup.Text>Waist size (cm)</InputGroup.Text>
-                            <FormControl ref={waistRef} value={waistSize} onChange={e => setWaistSize(e.target.value)} />
+                            <FormControl ref={waistRef} value={waistSize} onChange={e => setWaistSize(e.target.value)} type="number" min="0" />
                         </div>
                         <div>
                             <InputGroup.Text>Quads size (cm)</InputGroup.Text>
-                            <FormControl ref={quadsRef} value={quadsSize} onChange={e => setQuadsSize(e.target.value)} />
+                            <FormControl ref={quadsRef} value={quadsSize} onChange={e => setQuadsSize(e.target.value)} type="number" min="0" />
                         </div>
                         <div>
                             <InputGroup.Text>Chest size (cm)</InputGroup.Text>
-                            <FormControl ref={chestRef} value={chestSize} onChange={e => setChestSize(e.target.value)} />
+                            <FormControl ref={chestRef} value={chestSize} onChange={e => setChestSize(e.target.value)} type="number" min="0" />
                         </div>
                         <div>
                             <InputGroup.Text>Arms size (cm)</InputGroup.Text>
-                            <FormControl ref={armsRef} value={armsSize} onChange={e => setArmsSize(e.target.value)} />
+                            <FormControl ref={armsRef} value={armsSize} onChange={e => setArmsSize(e.target.value)} type="number" min="0" />
                         </div>
                     </InputGroup.Prepend>
                 </InputGroup>

@@ -1,7 +1,7 @@
 body {
     background-image: url('./images/gym_pic.jpg');
     background-size: cover;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85);
     background-blend-mode: darken;
 }
 
@@ -52,13 +52,16 @@ body {
 }
 
 .measurementDataWrapper {
-    /* style={{ display: 'flex', flexDirection: 'column', padding: '20px', color: 'white', border: '2px solid white', margin: '15px' */
     display: flex;
     flex-direction: column;
     padding: 20px;
     color: white;
     border: 2px solid white;
     margin: 15px;
+    max-width: 400px;
+    background-color: rgba(255, 0, 0, 0.15);
+    border-radius: 10%;
+    transition: 1s;
 }
 
 h4 {
@@ -68,6 +71,15 @@ h4 {
 
 .measurementsButtonsWrapper>* {
     width: 50%;
+}
+
+.searchInputGroup {
+    width: 80%;
+    margin: auto;
+}
+
+.searchInputGroup:last-child {
+    width: 90%;
 }
 
 @media (max-width: 1000px) {
@@ -110,6 +122,9 @@ h4 {
     }
     .measurementsWrapper {
         display: inline-block;
+        width: 100%;
+    }
+    .searchInputGroup:last-child {
         width: 100%;
     }
 }

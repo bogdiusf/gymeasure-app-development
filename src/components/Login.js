@@ -19,13 +19,17 @@ export default function Login() {
         try {
             setError('');
             setLoading(true);
-            await login(emailRef.current.value, passwordRef.current.value);
-            history.push('/')
+            const userInfo = await login(emailRef.current.value, passwordRef.current.value);
+            if (userInfo.user.emailVerified) {
+                history.push('/')
+            }
+            else {
+                setError('Please verify your email!')
+            }
         } catch (e) {
-            setError('Failed to sign in!')
-            console.log(e)
+            setError(e.code === 'auth/user-not-found' ? 'User doest not exist or wrong email! Sign up or check email credential!' : e.code === 'auth/wrong-password' ? 'Invalid password!' : 'Failed to sign in!')
         }
-        setLoading(false)
+        setLoading(false);
     }
 
     return (
@@ -36,7 +40,7 @@ export default function Login() {
                         <Card.Body>
                             <h2 className="text-center mb-4">Sign in</h2>
                             {error && <Alert variant="danger">{error}</Alert>}
-                            <Form onSubmit={handleLogin}>
+                            <Form onSubmit={(e) => handleLogin(e)}>
                                 <Form.Group id="email" className="mt-2">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control type="email" required ref={emailRef} placeholder="Please enter your e-mail"></Form.Control>
@@ -53,7 +57,7 @@ export default function Login() {
                         </Card.Body>
                     </Card>
                     <div className="w-100 text-center mt-2">
-                        <span>Don't have an account?</span> <Link to="/signup">Sign up</Link>
+                        <span style={{ color: 'white' }}>Don't have an account?</span> <Link to="/signup">Sign up</Link>
                     </div>
                 </div>
             </Container>

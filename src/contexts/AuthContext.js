@@ -15,9 +15,17 @@ export function AuthProvider({ children }) {
 
 
     const signup = (email, password) => {
-        // returning a promise
-        // createUserWithEmailAndPassword - firebase method for creating a new user
-        return auth.createUserWithEmailAndPassword(email, password)
+        async function handleSignup() {
+            const result = await auth.createUserWithEmailAndPassword(email, password)
+            try {
+                result.user.sendEmailVerification()
+                auth.signOut()
+            }
+            catch (e) {
+                console.log(e)
+            }
+        }
+        return handleSignup()
     }
 
     const login = (email, password) => {
