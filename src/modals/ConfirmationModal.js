@@ -14,6 +14,7 @@ export default function ConfirmationModal(props) {
                     if (
                         props.error === 'Your info has been successfully added!'
                         || props.error === 'Your info has been successfully updated!'
+                        || props.error === 'Your measurements has been successfully deleted!'
                     ) {
                         props.handleCloseConfirmationModal()
                     }

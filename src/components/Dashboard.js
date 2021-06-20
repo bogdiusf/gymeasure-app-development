@@ -81,6 +81,7 @@ export default function Dashboard() {
     const handleShowConfirmationModal = () => setConfirmationModal(true)
     const handleCloseConfirmationModal = () => {
         setConfirmationModal(false)
+        setShowAddPersInfo(false)
         setIsSavePInfoChangesEnabled(false)
     }
     const handleShowEditMeasurements = (id) => {
@@ -97,14 +98,16 @@ export default function Dashboard() {
         setShowEditMeasurements(false)
         setIsSaveMeasurementChangesEnabled(false)
     }
-    const showDeleteMeasurementConfirmation = () => setShowDeleteMeasurementConfirmationModal(true)
+    const showDeleteMeasurementConfirmation = () => {
+        setShowDeleteMeasurementConfirmationModal(true)
+    }
     const closeDeleteMeasurementConfirmation = () => setShowDeleteMeasurementConfirmationModal(false)
     // --------------------
 
     // function that returns a formatted date 'dd/mm/yyyy' and time 'hh:mm:ss'
     const getCurrentDateAndTime = () => {
         const completeDate = new Date()
-        const day = completeDate.getDay() < 10 ? '0' + completeDate.getDay() : completeDate.getDay()
+        const day = completeDate.getDate() < 10 ? '0' + completeDate.getDay() : completeDate.getDay()
         let month = completeDate.getMonth() + 1
         if (month < 10) {
             month = '0' + month
